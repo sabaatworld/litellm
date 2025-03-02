@@ -1,12 +1,22 @@
 model_list:
-  - model_name: fake-openai-endpoint
+  - model_name: Claude 3.5 V2
     litellm_params:
-      model: openai/my-fake-model
-      api_key: my-fake-key
-      api_base: https://exampleopenaiendpoint-production.up.railway.app/
-
-
-general_settings:
-  store_model_in_db: true
-  store_prompts_in_spend_logs: true
-
+      model: bedrock/us.anthropic.claude-3-5-sonnet-20241022-v2:0
+      aws_access_key_id: os.environ/BEDROCK_AWS_ACCESS_KEY_ID
+      aws_secret_access_key: os.environ/BEDROCK_AWS_SECRET_ACCESS_KEY
+      aws_session_token: os.environ/BEDROCK_AWS_SESSION_TOKEN
+      aws_region_name: os.environ/BEDROCK_AWS_REGION_NAME
+  - model_name: Claude 3.7
+    litellm_params:
+      model: bedrock/us.anthropic.claude-3-7-sonnet-20250219-v1:0
+      aws_access_key_id: os.environ/BEDROCK_AWS_ACCESS_KEY_ID
+      aws_secret_access_key: os.environ/BEDROCK_AWS_SECRET_ACCESS_KEY
+      aws_session_token: os.environ/BEDROCK_AWS_SESSION_TOKEN
+      aws_region_name: os.environ/BEDROCK_AWS_REGION_NAME
+  - model_name: Stable Diffusion 3.5 Large
+    litellm_params:
+      model: bedrock/stability.sd3-5-large-v1:0
+      aws_access_key_id: os.environ/BEDROCK_AWS_ACCESS_KEY_ID
+      aws_secret_access_key: os.environ/BEDROCK_AWS_SECRET_ACCESS_KEY
+      aws_session_token: os.environ/BEDROCK_AWS_SESSION_TOKEN
+      aws_region_name: os.environ/BEDROCK_AWS_REGION_NAME

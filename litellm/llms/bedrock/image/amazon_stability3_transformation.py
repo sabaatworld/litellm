@@ -40,7 +40,7 @@ class AmazonStability3Config:
         """
         No additional OpenAI params are mapped for stability 3
         """
-        return []
+        return ["n", "response_format", "size"]
 
     @classmethod
     def _is_stability_3_model(cls, model: Optional[str] = None) -> bool:
@@ -70,17 +70,50 @@ class AmazonStability3Config:
     ) -> AmazonStability3TextToImageRequest:
         """
         Transform the request body for the Stability 3 models
+        
+        Removes aws_region_name from params since it's not part of the model's request format
         """
-        data = AmazonStability3TextToImageRequest(prompt=prompt, **optional_params)
+        # Create a copy of optional_params to avoid modifying the original
+        params = optional_params.copy()
+        
+        # Remove aws_region_name if it exists
+        params.pop('aws_region_name', None)
+        
+        data = AmazonStability3TextToImageRequest(prompt=prompt, **params)
         return data
 
     @classmethod
     def map_openai_params(cls, non_default_params: dict, optional_params: dict) -> dict:
         """
-        Map the OpenAI params to the Bedrock params
-
-        No OpenAI params are mapped for Stability 3, so directly return the optional_params
+        Map the OpenAI params to the Bedrock params for Stability 3 models
+        
+        Parameters that need mapping:
+        - size: Convert from "widthxheight" format to an appropriate aspect_ratio
         """
+        _size = non_default_params.get("size")
+        if _size is not None:
+            width, height = map(int, _size.split("x"))
+            
+            # Calculate the aspect ratio based on width and height
+            # Map to the closest supported aspect ratio
+            aspect_ratios = {
+                "16:9": 16/9,
+                "1:1": 1/1,
+                "21:9": 21/9,
+                "2:3": 2/3,
+                "3:2": 3/2,
+                "4:5": 4/5,
+                "5:4": 5/4,
+                "9:16": 9/16,
+                "9:21": 9/21
+            }
+            
+            requested_ratio = width / height
+            
+            # Find the closest aspect ratio
+            closest_ratio = min(aspect_ratios.items(), key=lambda x: abs(x[1] - requested_ratio))
+            optional_params["aspect_ratio"] = closest_ratio[0]
+        
         return optional_params
 
     @classmethod
